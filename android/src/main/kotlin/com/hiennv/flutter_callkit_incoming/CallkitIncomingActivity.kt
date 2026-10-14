@@ -8,7 +8,6 @@
 package com.hiennv.flutter_callkit_incoming
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -364,15 +363,10 @@ class CallkitIncomingActivity : Activity() {
             TransparentActivity.getIntent(this, CallkitConstants.ACTION_CALL_ACCEPT, data)
         startActivity(acceptIntent)
 
-        dismissKeyguard()
+        // Rinly (T-819): do not request keyguard dismissal on accept. The host app's
+        // activity shows itself over the lock screen for the call, like the phone
+        // app; asking to unlock here forced a PIN/biometric prompt mid-call.
         finish()
-    }
-
-    private fun dismissKeyguard() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            keyguardManager.requestDismissKeyguard(this, null)
-        }
     }
 
     private fun onDeclineClick() {
